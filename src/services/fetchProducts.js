@@ -25,7 +25,7 @@ export type ProductsData = {
 
 /**
  * Fetches all currently available products
- * @returns {ProductsData}
+ * @returns {Promise<ProductsData>}
  */
 const fetchProducts = async (): Promise<ProductsData> => {
   const response = await axios.get(PRODUCTS_API);

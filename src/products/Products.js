@@ -11,19 +11,16 @@ type Props = {
 
 /**
  * @component
- * Container for displaying filtered products
+ * For displaying all filtered products
  */
-const Products = ({ products }: Props) => {
-  console.log('render');
-  return (
-    <div className="Products-grid">
-      {products.length
-        ? products.map((product) => (
-            <Product key={product.variantId} product={product} />
-          ))
-        : 'Sorry, no results'}
-    </div>
-  );
-};
+const Products = ({ products }: Props) => (
+  <div className="Products-grid">
+    {products.length
+      ? products.map((product) => (
+          <Product key={product.variantId} product={product} />
+        ))
+      : 'Sorry, no results'}
+  </div>
+);
 
 export default Products;

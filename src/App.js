@@ -9,15 +9,17 @@ import { ALL_PRODUCTS_FILTER, PRODUCTS_PER_PAGE } from './constants';
 import CategoryFilter from './filter/CategoryFilter';
 import TagsFilter from './filter/TagsFilter';
 import PageNav from './pagination/PageNav';
+import { productHasCategory, productHasAllTags } from './filter/utilities';
 
-// Add searchbox by name? Description?
-// Paginate with ~8-12 per page
+// TODO: Add searchbox to search by name? By description?
+// TODO: Add Unit tests for components
 
 /**
  * Top-level component
  * @component
  * State of the component:
  * @type {ProductData} productsData - All available products.
+ * @type {boolean} isLoading - Waiting for API response.
  * @type {Set<string>} filterTags - The set of all user-selected tags to filter products by.
  * @type {string} filterCategory - The user-selected category to filter by.
  */
@@ -27,6 +29,7 @@ const App = () => {
     tags: [],
     categories: [],
   });
+  const [isLoading, setIsLoading] = useState(false);
   const [filterTags, setFilterTags] = useState<Set<string>>(new Set());
   const [filterCategory, setFilterCategory] = useState<string>(
     ALL_PRODUCTS_FILTER
@@ -35,8 +38,10 @@ const App = () => {
 
   useEffect(() => {
     const getProducts = async () => {
+      setIsLoading(true);
       const response = await fetchProducts();
       setProductsData(response);
+      setIsLoading(false);
     };
     getProducts();
   }, []);
@@ -45,71 +50,54 @@ const App = () => {
     setPage(0);
   }, [filterTags, filterCategory]);
 
-  // Returns true only if a product has all filterTags
-  const hasAllTags = (product: Product) => {
-    // If no tags are selected, do not filter on tags.
-    if (!filterTags.size) {
-      return true;
-    }
-    let hasTags = true;
-    const tagValues = filterTags.values();
-    let nextTag = tagValues.next();
-    while (hasTags && !nextTag.done) {
-      if (!product.tags[nextTag.value]) {
-        hasTags = false;
-      }
-      nextTag = tagValues.next();
-    }
-    return hasTags;
-  };
-
-  // Returns true only if the product has the filterCategory
-  const hasCategory = (product: Product) => {
-    if (filterCategory === ALL_PRODUCTS_FILTER) {
-      return true;
-    }
-    return product.categories.some((category) => category === filterCategory);
-  };
-
   const filteredProducts = productsData.products.filter((product) => {
-    return hasCategory(product) && hasAllTags(product);
+    return (
+      productHasCategory(product, filterCategory) &&
+      productHasAllTags(product, filterTags)
+    );
   });
 
   return (
     <div className="app">
-      <div className="App-row">
-        <CategoryFilter
-          setFilterCategory={setFilterCategory}
-          categories={productsData.categories}
-        />
-      </div>
-      <div className="App-row">
-        <TagsFilter
-          addTag={(tag) => setFilterTags(new Set(filterTags).add(tag))}
-          removeTag={(tag) => {
-            const newTags = new Set(filterTags);
-            newTags.delete(tag);
-            setFilterTags(newTags);
-          }}
-          tags={productsData.tags}
-        />
-      </div>
-      <div className="App-row">
-        <Products
-          products={filteredProducts.slice(
-            page * PRODUCTS_PER_PAGE,
-            page * PRODUCTS_PER_PAGE + PRODUCTS_PER_PAGE
+      {isLoading ? (
+        'Loading...'
+      ) : (
+        <>
+          <div className="App-row">
+            <CategoryFilter
+              setFilterCategory={setFilterCategory}
+              categories={productsData.categories}
+            />
+          </div>
+          <div className="App-row">
+            <TagsFilter
+              addTag={(tag) => setFilterTags(new Set(filterTags).add(tag))}
+              removeTag={(tag) => {
+                const newTags = new Set(filterTags);
+                newTags.delete(tag);
+                setFilterTags(newTags);
+              }}
+              tags={productsData.tags}
+            />
+          </div>
+          <div className="App-row">
+            <Products
+              products={filteredProducts.slice(
+                page * PRODUCTS_PER_PAGE,
+                page * PRODUCTS_PER_PAGE + PRODUCTS_PER_PAGE
+              )}
+            />
+          </div>
+          {filteredProducts.length > PRODUCTS_PER_PAGE && (
+            <div className="App-row">
+              <PageNav
+                numProducts={filteredProducts.length}
+                page={page}
+                setPage={setPage}
+              />
+            </div>
           )}
-        />
-      </div>
-      {filteredProducts.length > PRODUCTS_PER_PAGE && (
-        <div className="App-row">
-          <PageNav
-            numProducts={filteredProducts.length}
-            page={page}
-            setPage={setPage}
-          />
-        </div>
+        </>
       )}
     </div>
   );

@@ -84,7 +84,9 @@ The folder structure reflects the component structure.
 
 There are many enhancements that could be made on this simple application. For example:
 
-- There is much room for improvement for the CSS design of the page
+- There is much room for improvement for the UX of the page
+  - Make the app responsive, mobile-friendly, a11y
+  - Better UX all around with the filters, interacting with the products
 - More unit tests should be written to test individual components
 - More features could be added
 - If the app were going to grow more complicated, with shopping carts, checkout, etc., the app's state could be moved to one managed by `react-redux`

@@ -3,6 +3,7 @@
   border-radius: 4px;
   margin: 36px;
   width: 20%;
+  min-width: 300px;
 }
 
 .Product-card > * {

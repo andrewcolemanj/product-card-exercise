@@ -6,6 +6,16 @@
   display: flex;
   flex: 1;
   margin: 36px;
+  align-items: center;
+  justify-content: center;
+}
+
+.Products-container {
+  flex-direction: row;
+}
+
+.App-column {
+  justify-content: top;
 }
 
 .App-logo {

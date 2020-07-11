@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Products from './products/Products';
-import type { Product, ProductsData } from './services/fetchProducts';
+import type { ProductsData } from './services/fetchProducts';
 import fetchProducts from './services/fetchProducts';
 import { ALL_PRODUCTS_FILTER, PRODUCTS_PER_PAGE } from './constants';
 import CategoryFilter from './filter/CategoryFilter';
@@ -36,6 +36,7 @@ const App = () => {
   );
   const [page, setPage] = useState<number>(0);
 
+  // Get the list of products from the API on mount.
   useEffect(() => {
     const getProducts = async () => {
       setIsLoading(true);
@@ -46,6 +47,7 @@ const App = () => {
     getProducts();
   }, []);
 
+  // Reset to page zero when the filters change
   useEffect(() => {
     setPage(0);
   }, [filterTags, filterCategory]);

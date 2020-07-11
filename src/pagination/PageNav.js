@@ -22,7 +22,8 @@ const PageNav = ({ numProducts, page, setPage }: Props) => (
         <b>{'<'}</b>
       </button>
     )}
-    <span className="Page-label">Page: {page}</span>
+    {/* Adding 1 to the page value for UX of seeing "Page 1" instead of "Page 0" */}
+    <span className="Page-label">Page {page + 1}</span>
     {/* Only show next button if there are more products to view */}
     {numProducts > (page + 1) * PRODUCTS_PER_PAGE && (
       <button onClick={() => setPage(page + 1)}>

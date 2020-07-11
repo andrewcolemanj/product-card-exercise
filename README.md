@@ -1,81 +1,90 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Product Card Exercise
+
+This repository is a simple application for displaying a list of grocery products. Its main purpose is for use as a code sample.
+
+The application may be [run locally](#running). Products may be filtered by category (e.g. "Sweet Snacks") through a dropdown or by any number of tags (e.g. "Organic") through checkboxes. 8 products are shown per page. The user may click through more products by using the page navigation at the bottom of the page.
+
+**Quick Links**
+
+- [Running](#running)
+- [Testing](#testing)
+- [Flow Types](#types)
+- [Component Structure](#component-structure)
+- [Next Steps](#next-steps)
 
 ## Running
 
-We added a separate express API to serve products to the client app.  To run that prior to kicking
-off the webpack dev server running the react app:
+After pulling down the repo, you must first install dependencies:
 
 ```sh
-# Run on a later version of node
-# Runs on PORT 9001 by default, but can set the PORT env variable to run on a different port
+$ npm install
+```
+
+The frontend is served by a node express server. To start the server:
+
+```sh
 $ node api/server.js
 ```
 
-Then, move on to running the client below...
+Then, to run the app in development mode:
 
-## Available Scripts
+```sh
+$ npm start
+```
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br>
 You will also see any lint errors in the console.
 
-### `npm test`
+## Testing
 
-Launches the test runner in the interactive watch mode.<br>
+To run unit tests:
+
+```sh
+$ npm run test
+```
+
+This launches the test runner in the interactive watch mode.<br>
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+The filtering logic is tested extensively in src/filter/utilities.test.js
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+See [Next Steps](#next-steps) for ideas for how testing could be further developed.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Flow Types
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This app uses [flow types](https://flow.org/) as a way of documenting React components, expected props, and function signatures, as well as a way to catch errors before runtime.
 
-### `npm run eject`
+To check for type errors, run:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```sh
+$ npm run flow
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+See [flow documentation](https://flow.org/en/docs/install/) for more details on how to setup your IDE.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Component Structure
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Most of the app's state is stored at the top-level component, `<App>`.
 
-## Learn More
+On mount, `<App>` calls the `fetchProducts` service which executes the GET request to our node.js server. After making the request, while waiting for the asynchronous response, `isLoading` is set to true, giving the user feedback that the request for data is being made.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+`<App>` then stores the response in its component state, which contains the list of products, the list of categories to filter on, and the list of tags to filter on.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+`<App>` renders a `<CategoryFilter>` and a `<TagsFilter>`, passing down the necessary data for the components to be rendered and a function to call when the filters change due to user interaction.
 
-### Code Splitting
+`<App>` renders a `<PageNav>` with simple arrows for the user to navigate through a long list of products. Currently, only 8 products are displayed on a page at a time, though this can be changed by altering the `PRODUCTS_PER_PAGE` in `constants.js`. The App is reset to the initial page when the filters change.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+`<App>` renders a `<Products>` component, passing an array of product data that is filtered based on the state of the Category Filter, the Tags Filter, and the Page the user is on.
 
-### Analyzing the Bundle Size
+The folder structure reflects the component structure.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+## Next Steps
 
-### Making a Progressive Web App
+There are many enhancements that could be made on this simple application. For example:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- There is much room for improvement for the CSS design of the page
+- More unit tests should be written to test individual components
+- More features could be added
+- If the app were going to grow more complicated, with shopping carts, checkout, etc., the app's state could be moved to one managed by `react-redux`
